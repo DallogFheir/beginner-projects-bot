@@ -129,7 +129,8 @@ class BPB:
 
         # adds edits for awards
         for award in comment.all_awardings:
-            if (name := award["name"]) not in parsed_comment.awards:
+            name = award["name"]
+            if name not in parsed_comment.awards:
                 text = self.award_text.replace("(.*)",name)
                 parsed_comment.add_edit(text)
 
