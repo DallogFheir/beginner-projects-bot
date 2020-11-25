@@ -1,122 +1,163 @@
+from comment_parser import CommentParser
+from comment_parser.texts import AWARD_TEXT, PRAISE_PATTERN, REPLY_TO_PRAISE_TEXT, TITLE_PATTERN, UPVOTES_TEXTS
+from concurrent.futures import ThreadPoolExecutor
 import praw
 import re
 
-class Beginner_Projects_Bot:
-    #region REPLY TEXTS
-    reply_txt = "1. Create a bot to reply to \"what are some beginner projects\" questions on this subreddit, using [PRAW](https://praw.readthedocs.io/en/latest/index.html).\n\nOther than that, [here's](https://www.reddit.com/r/learnpython/wiki/index#wiki_tools_for_learning_python) a list of lists of beginner projects in the subreddit wiki. [Here's](https://github.com/jorgegonzalez/beginner-projects) another list on Github. Good luck!"
-    small_txt = "\n\n^(Downvote me if the post wasn't a question about examples of beginner projects. Thank you.)"
+class BPB:    
+    def __init__(self):
+        '''
+        A Reddit bot to respond to submissions on r/learnpython asking for beginner projects.
+        '''
 
-    edit_txt = "\n\nedit"
+        # reads config from env vars
+        # if not found, from praw.ini
+        self.reddit = praw.Reddit()
 
-    ranges_lst = [5, 10, 50, 100]
-    upvotes_txt_lst = [
-        "thanks for 5 upvotes!",
-        "omg 10 upvotes!!!! Thank you!!",
-        "50 upvotes??? 😲😲😲 Can we make it to 100?",
-        "100 UPVOTES?????? I CAN DIE NOW"
-    ]
-
-    award_txt_start = "Thank you for the"
-    award_txt_end = ", kind stranger!"
-    #endregion
-    #region REGEX PATTERN
-    title_pattern = re.compile(r"""
-    (
-        (\bsimple\ program(s)?\ idea(s)?\b)
-    ) |
-    (
-        (\bbeg(g)?i(n)?ner(s)?\b|\bsimple\b)
-        \ 
-        (\w*\ )?
-        (\bproject(s)?\b)
-    ) |
-    (
-        (\bproject(s)?\b|\bprogram(s)?\b)
-        \ for\  
-        (\bbeg(g)?i(n)?ner(s)?\b|\bbegi(n)?ning\b)
-    )
-    """,re.I|re.VERBOSE)
-    #endregion
-    
-    def __init__(self,client_id,client_secret,user_agent,username,password):
-        self.reddit = praw.Reddit(client_id=client_id,
-                        client_secret=client_secret,
-                        user_agent=user_agent,
-                        username=username,
-                        password=password)
         self.sub = self.reddit.subreddit("learnpython")
         self.bot = self.reddit.redditor("BeginnerProjectsBot")
 
-    def comment(self):
-        for post in self.sub.new(limit=None):
-            if re.search(self.title_pattern,post.title):
-                # if already upvoted, ignore
-                if not post.likes:
-                    cur_reply = post.reply(self.reply_txt+self.small_txt)
-                    post.upvote()
+        # import constants
+        self.award_text = AWARD_TEXT
+        self.reply_to_praise_text = REPLY_TO_PRAISE_TEXT
+        self.praise_pattern = PRAISE_PATTERN
+        self.title_pattern = TITLE_PATTERN
+        self.upvotes_ranges = UPVOTES_TEXTS
 
-                    # log
-                    print("Replied: https://www.reddit.com"+cur_reply.permalink)
+    # MAIN METHODS
+    def start(self,limit=None):
+        '''
+        Starts the bot's functionality in 2 threads.
+        '''
 
-    def edit_comments(self):
-        for comment in self.bot.comments.new(limit=None):
-            # DELETES COMMENT IF DOWNVOTED
-            if comment.score < 0:
-                comment.delete()
+        with ThreadPoolExecutor() as e:
+            e.submit(self.traverse_new_submissions,limit)
+            e.submit(self.traverse_own_comments,limit)
+    def traverse_new_submissions(self,limit=None):
+        '''
+        Traverses new submissions in r/learnpython and replies to them.
 
-                # log
-                print("Deleted: https://www.reddit.com" + comment.permalink)
+        Takes an optional 'limit' paramter for debugging.
+        '''
 
-                continue
+        # count for debugging if 'limit' is used
+        count = 0
+        
+        for post in self.sub.stream.submissions():
+            print("Checking new post...")
 
-            # EDITS COMMENT IF UPVOTES AWARDS/GIVEN
-            edited_body = comment.body
-
-            # removes small_txt from comment body (added at end)
-            edited_body = edited_body.replace(self.small_txt,"")
-
-            # gets last edit number from comment
-            edit_re = re.findall(r"edit(\d*).",comment.body)
-
-            if not edit_re:
-                # if no match, start at 1
-                edit_count = 1
-            elif len(edit_re)==1:
-                # if one match = empty string, start at 2
-                edit_count = 2
-            else:
-                # otherwise, start at number from comment + 1
-                edit_count = int(edit_re[-1]) + 1
-
-            # add thanks for upvotes, if not already in the comment
-            for i, r in enumerate(self.ranges_lst):
-                # checks if score is greater than given range and respective text is not in comment
-                if comment.score >= r and self.upvotes_txt_lst[i] not in comment.body:
-                    # checks if edit_count is 1, then makes it empty string
-                    edit_count_str="" if edit_count==1 else str(edit_count)
-
-                    edited_body += f"{self.edit_txt}{edit_count_str}. {self.upvotes_txt_lst[i]}"
-
-                    edit_count+=1
-
-            # ADD THANKS FOR AWARDS
-            already_thanked = re.findall("Thank you for the (.*)?, kind stranger!",comment.body)
-
-            for award in comment.all_awardings:
-                if award["name"] not in already_thanked:
-                    # checks if edit_count is 1, then makes it empty string
-                    edit_count_str="" if edit_count==1 else str(edit_count)
-
-                    edited_body += f'{self.edit_txt}{edit_count_str}. {self.award_txt_start} {award["name"]}{self.award_txt_end}'
-
-                    edit_count+=1
-
-            # adds small_txt back
-            edited_body += self.small_txt
-
-            # edits comment
-            if edited_body!=comment.body:
-                comment.edit(edited_body)
+            # ignore if already upvoted (to make sure bot doesn't comment on the same post again)
+            if self.check_title(post.title) and not post.likes:
+                post.upvote()
+                cur_reply = post.reply(self.reply_text)
 
                 # log
-                print("Edited: https://www.reddit.com" + comment.permalink)
+                print(f"Replied: https://www.reddit.com{cur_reply.permalink}")
+
+            if limit is not None:
+                if count >= limit:
+                    break
+
+                count += 1
+    def traverse_own_comments(self,limit=None):
+        '''
+        Traverses the bot's comments and edits or deletes them, and replies to "good bot" replies.
+
+        Takes an optional 'limit' parameter to debug.
+        '''
+
+        # count for debugging if 'limit' is used
+        count = 0
+        running = True
+
+        while running:
+            print("Checking comments...")
+
+            for comment in self.bot.comments.new(limit=None):
+                if self.delete_downvoted_comment(comment):
+                    continue
+                # ignore reply to praise comments
+                if comment.body != self.reply_to_praise_text:
+                    self.edit_comment(comment)
+                self.reply_to_praise(comment)
+
+                if limit is not None:
+                    if count >= limit:
+                        running = False
+                        break
+
+                    count += 1
+
+    # COMMENT MANIPULATION METHODS
+    def delete_downvoted_comment(self, comment : praw.models.Comment) -> bool:
+        '''
+        Deletes comment with score less than 0.
+        '''
+
+        if comment.score < 0:
+            comment.delete()
+            
+            # log
+            print(f"Deleted: https://www.reddit.com{comment.permalink}")
+
+            # return for condition in traverse_own_comments
+            return True
+
+        return False
+    def edit_comment(self, comment : praw.models.Comment):
+        '''
+        Edits comment if new comment text is different than old comment text.
+        '''
+        new_text = self.create_new_text(comment)
+        if new_text != comment.body:
+            comment.edit(new_text)
+
+            # log
+            print(f"Edited: https://www.reddit.com{comment.permalink}")
+    # helper
+    def create_new_text(self,comment : praw.models.Comment) -> str:
+        '''
+        Creates new comment text based on the number of upvotes and received awards.
+        '''
+
+        parsed_comment = CommentParser(comment.body)
+        
+        # adds edits for upvotes
+        for score, text in self.upvotes_ranges.items():
+            if comment.score >= int(score) and text not in parsed_comment.edit_txts:
+                parsed_comment.add_edit(text)
+
+        # adds edits for awards
+        for award in comment.all_awardings:
+            if (name := award["name"]) not in parsed_comment.awards:
+                text = self.award_text.replace("(.*)",name)
+                parsed_comment.add_edit(text)
+
+        return parsed_comment.body
+
+    def check_title(self,title : str) -> bool:
+        '''
+        Checks if the title of a post matches the title Regex pattern.
+        '''
+
+        # checks if title matches regex
+        match = re.search(self.title_pattern,title)
+
+        return False if match is None else True
+
+    def reply_to_praise(self, comment : praw.models.Comment):
+        '''
+        Replies to "good bot" comments in replies to the bot's comments.
+        '''
+
+        # needs to refresh to get replies
+        comment.refresh()
+
+        for reply in comment.replies:
+            # ignore already upvoted replies
+            if re.match(self.praise_pattern,reply.body) and not reply.likes:
+                cur_reply = reply.reply(self.reply_to_praise_text)
+                reply.upvote()
+
+                # log
+                print(f"Replied to praise: https://www.reddit.com{cur_reply.permalink}")

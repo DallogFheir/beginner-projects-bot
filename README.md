@@ -8,6 +8,11 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.0.0
+  - remodeled the structure of the package
+  - bot now responds to "good bot" replies to its comments
+- 2.1.0
+  - changed bot to use stream provided by PRAW
 - 2.0.0
   - recreated the bot with a more OOP approach
 - 1.1.2
