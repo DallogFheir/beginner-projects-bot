@@ -1,7 +1,7 @@
 #region IMPORTS
 from comment_parser.texts import AWARD_PATTERN, MAIN_TEXT, SMALL_TEXT
 import re
-from typing import Union
+from typing import List, Union
 #endregion
 
 class CommentParser:
@@ -35,7 +35,7 @@ class CommentParser:
         return None if self.edits == {} else list(self.edits.keys())[-1]
 
     @property
-    def edit_txts(self) -> list:
+    def edit_txts(self) -> List[str]:
         '''
         Returns the texts of edits.
         '''
@@ -43,7 +43,7 @@ class CommentParser:
         return self.edits.values()
 
     @property
-    def awards(self) -> list[str]:
+    def awards(self) -> List[str]:
         '''
         Returns awards mentioned in the edits.
         '''
