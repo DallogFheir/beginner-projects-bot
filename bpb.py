@@ -1,9 +1,15 @@
+#TODO logging
+
+#region IMPORTS
 from comment_parser import CommentParser
-from comment_parser.texts import AWARD_TEXT, PRAISE_PATTERN, REPLY_TO_PRAISE_TEXT, TITLE_PATTERN, UPVOTES_TEXTS
+from comment_parser.texts import AWARD_TEXT, MAIN_TEXT, PRAISE_PATTERN, REPLY_TO_PRAISE_TEXT, SMALL_TEXT, TITLE_PATTERN, UPVOTES_TEXTS
 from concurrent.futures import ThreadPoolExecutor
 import praw
 import re
 import time
+#endregion
+
+USER_AGENT = "script:beginner-projects-bot:v3.0.1 (by /u/DallogFheir)"
 
 class BPB:    
     def __init__(self):
@@ -13,7 +19,7 @@ class BPB:
 
         # reads config from env vars
         # if not found, from praw.ini
-        self.reddit = praw.Reddit()
+        self.reddit = praw.Reddit(user_agent=USER_AGENT)
 
         self.sub = self.reddit.subreddit("learnpython")
         self.bot = self.reddit.redditor("BeginnerProjectsBot")
@@ -24,6 +30,7 @@ class BPB:
         self.praise_pattern = PRAISE_PATTERN
         self.title_pattern = TITLE_PATTERN
         self.upvotes_ranges = UPVOTES_TEXTS
+        self.reply_text = MAIN_TEXT + "\n\n" + SMALL_TEXT
 
     # MAIN METHODS
     def start(self,limit=None):
@@ -48,8 +55,8 @@ class BPB:
         for post in self.sub.stream.submissions():
             # ignore if already upvoted (to make sure bot doesn't comment on the same post again)
             if self.check_title(post.title) and not post.likes:
-                post.upvote()
                 cur_reply = post.reply(self.reply_text)
+                post.upvote()
 
                 # log
                 print(f"Replied: https://www.reddit.com{cur_reply.permalink}")

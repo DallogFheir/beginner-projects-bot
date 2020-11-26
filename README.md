@@ -8,6 +8,9 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.0.1
+  - fixed text constants and extra newline
+  - removed unecessary prints
 - 3.0.0
   - remodeled the structure of the package
   - bot now responds to "good bot" replies to its comments
