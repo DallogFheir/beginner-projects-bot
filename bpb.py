@@ -3,6 +3,7 @@ from comment_parser.texts import AWARD_TEXT, PRAISE_PATTERN, REPLY_TO_PRAISE_TEX
 from concurrent.futures import ThreadPoolExecutor
 import praw
 import re
+import time
 
 class BPB:    
     def __init__(self):
@@ -31,8 +32,9 @@ class BPB:
         '''
 
         with ThreadPoolExecutor() as e:
-            e.submit(self.traverse_new_submissions,limit)
-            e.submit(self.traverse_own_comments,limit)
+            self.submission_traverser = e.submit(self.traverse_new_submissions,limit)
+            self.comment_traverser = e.submit(self.traverse_own_comments,limit)
+            e.submit(self.check_status)
     def traverse_new_submissions(self,limit=None):
         '''
         Traverses new submissions in r/learnpython and replies to them.
@@ -44,8 +46,6 @@ class BPB:
         count = 0
         
         for post in self.sub.stream.submissions():
-            print("Checking new post...")
-
             # ignore if already upvoted (to make sure bot doesn't comment on the same post again)
             if self.check_title(post.title) and not post.likes:
                 post.upvote()
@@ -71,8 +71,6 @@ class BPB:
         running = True
 
         while running:
-            print("Checking comments...")
-
             for comment in self.bot.comments.new(limit=None):
                 if self.delete_downvoted_comment(comment):
                     continue
@@ -87,6 +85,21 @@ class BPB:
                         break
 
                     count += 1
+
+    # MAINTENANCE METHODS
+    def check_status(self):
+        while True:
+            if self.comment_traverser.running():
+                print("Checking comments working...")
+            else:
+                print("Checking comments broke!")
+
+            if self.submission_traverser.running():
+                print("Checking submissions working...")
+            else:
+                print("Checking submissions broke!")
+
+            time.sleep(3600*24)
 
     # COMMENT MANIPULATION METHODS
     def delete_downvoted_comment(self, comment : praw.models.Comment) -> bool:
