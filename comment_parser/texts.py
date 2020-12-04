@@ -28,18 +28,19 @@ AWARD_TEXT = "Thank you for the (.*), kind stranger!"
 AWARD_PATTERN = re.compile(AWARD_TEXT)
 
 _title_text = r"""(
-(\bsimple\ program(s)?\ idea(s)?\b)
+    (\bsimple\ program(s)?\ idea(s)?\b)
 ) |
 (
-(\bbeg(g)?i(n)?ner(s)?\b|\bsimple\b)
-\ 
-(\w*\ )?
-(\bproject(s)?\b)
+    (\bbeg(g)?i(n)?ner(s)?\b|\bsimple\b)
+    \ 
+    (\w*\ )?
+    (\bproject(s)?\b)
+    (?!.*done)
 ) |
 (
-(\bproject(s)?\b|\bprogram(s)?\b)
-\ for\  
-(\bbeg(g)?i(n)?ner(s)?\b|\bbegi(n)?ning\b)
+    (\bproject(s)?\b|\bprogram(s)?\b)
+    \ for\ 
+    (\bbeg(g)?i(n)?ner(s)?\b|\bbegi(n)?ning\b)
 )"""
 TITLE_PATTERN = re.compile(_title_text,re.I|re.X)
 

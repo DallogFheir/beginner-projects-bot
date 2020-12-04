@@ -8,6 +8,10 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.1.0
+  - added logging
+  - added unit testing for Regex patterns
+  - added support for command line arguments
 - 3.0.1
   - fixed text constants and extra newline
   - removed unecessary prints

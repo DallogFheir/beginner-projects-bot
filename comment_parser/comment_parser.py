@@ -1,5 +1,5 @@
 #region IMPORTS
-from comment_parser.texts import AWARD_PATTERN, MAIN_TEXT, SMALL_TEXT
+from comment_parser import texts
 import re
 from typing import List, Union
 #endregion
@@ -13,9 +13,9 @@ class CommentParser:
         self.edits = self.extract_edits(comment_text)
 
         # imports constants
-        self.main_text = MAIN_TEXT
-        self.small_text = SMALL_TEXT
-        self.award_pattern = AWARD_PATTERN
+        self.main_text = texts.MAIN_TEXT
+        self.small_text = texts.SMALL_TEXT
+        self.award_pattern = texts.AWARD_PATTERN
 
     def add_edit(self,text : str):
         '''
