@@ -46,5 +46,8 @@ class TestTexts(unittest.TestCase):
     def test_praise_pattern(self):
         self._test_data()
 
+    def test_critique_pattern(self):
+        self._test_data()
+
 if __name__=="__main__":
     unittest.main()

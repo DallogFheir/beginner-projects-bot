@@ -8,6 +8,10 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.2.0
+  - bot now responds to "bad bot" comments too
+  - fixed dead link
+  - fixed edit numbers starting at 1
 - 3.1.0
   - added logging
   - added unit testing for Regex patterns

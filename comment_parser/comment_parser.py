@@ -67,7 +67,7 @@ class CommentParser:
         # edit0. should be edit.
         # check if edits exist so that no extra newlines are added
         edits = "\n\n" + "\n\n".join(
-            f'edit{"" if num==0 else num}. {text}'
+            f'edit{"" if num==0 else num+1}. {text}'
             for num, text in self.edits.items()) if list(self.edits) else ""
         middle = edits + "\n\n"
 

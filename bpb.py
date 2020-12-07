@@ -8,7 +8,7 @@ from typing import Union
 import utils.logger
 #endregion
 
-class BPB:  
+class BPB:
     url = "https://www.reddit.com"
 
     def __init__(self,user_agent:str,debug:bool=False,limit:Union[int,None]=None,logging_level:str="INFO"):
@@ -35,7 +35,9 @@ class BPB:
         # import constants
         self.award_text = texts.AWARD_TEXT
         self.reply_to_praise_text = texts.REPLY_TO_PRAISE_TEXT
+        self.reply_to_critique_text = texts.REPLY_TO_CRITIQUE_TEXT
         self.praise_pattern = texts.PRAISE_PATTERN
+        self.critique_pattern = texts.CRITIQUE_PATTERN
         self.title_pattern = texts.TITLE_PATTERN
         self.upvotes_ranges = texts.UPVOTES_TEXTS
         self.reply_text = texts.MAIN_TEXT + "\n\n" + texts.SMALL_TEXT
@@ -85,7 +87,7 @@ class BPB:
                     cur_reply = post.reply(self.reply_text)
                     post.upvote()
 
-                self.logger.info(self.url + cur_reply.permalink)
+                self.logger.info(f"{self.debug_str}Replied to submission: {self.url + cur_reply.permalink}")
     def traverse_own_comments(self):
         '''
         Traverses the bot's comments and edits or deletes them, and replies to "good bot" replies.
@@ -112,7 +114,7 @@ class BPB:
                 # ignore reply to praise comments
                 if comment.body != self.reply_to_praise_text:
                     self.edit_comment(comment)
-                self.reply_to_praise(comment)
+                self.reply_to_judgment(comment)
 
     # COMMENT MANIPULATION METHODS
     def delete_downvoted_comment(self, comment : praw.models.Comment) -> bool:
@@ -140,9 +142,9 @@ class BPB:
                 comment.edit(new_text)
 
             self.logger.info(f"{self.debug_str}Edited comment: {self.url + comment.permalink}.")
-    def reply_to_praise(self, comment : praw.models.Comment):
+    def reply_to_judgment(self, comment : praw.models.Comment):
         '''
-        Replies to "good bot" comments in replies to the bot's comments.
+        Replies to "good bot"/"bad bot" comments in replies to the bot's comments.
         '''
 
         # needs to refresh to get replies
@@ -150,15 +152,25 @@ class BPB:
 
         for reply in comment.replies:
             # ignore already upvoted replies
-            if re.match(self.praise_pattern,reply.body) and not reply.likes:
-                # for log
-                cur_reply = reply
+            if not reply.likes:
+                if re.match(self.praise_pattern,reply.body):
+                    # for log
+                    cur_reply = reply
 
-                if not self.debug:
-                    cur_reply = reply.reply(self.reply_to_praise_text)
-                    reply.upvote()
+                    if not self.debug:
+                        cur_reply = reply.reply(self.reply_to_praise_text)
+                        reply.upvote()
 
-                self.logger.info(f"{self.debug_str}Replied: {self.url + cur_reply.permalink}.")
+                    self.logger.info(f"{self.debug_str}Replied to praise: {self.url + cur_reply.permalink}.")
+                elif re.match(self.critique_pattern,reply.body):
+                    # for log
+                    cur_reply = reply
+
+                    if not self.debug:
+                        cur_reply = reply.reply(self.reply_to_critique_text)
+                        reply.upvote()
+
+                    self.logger.info(f"{self.debug_str}Replied to critique: {self.url + cur_reply.permalink}.")
     # helpers
     def create_new_text(self,comment : praw.models.Comment) -> str:
         '''
