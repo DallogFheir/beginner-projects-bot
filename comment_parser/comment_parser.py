@@ -30,15 +30,7 @@ class CommentParser:
         Returns the last edit number.
         '''
 
-        return None if self.edits == {} else list(self.edits.keys())[-1]
-
-    @property
-    def edit_txts(self) -> List[str]:
-        '''
-        Returns the texts of edits.
-        '''
-
-        return self.edits
+        return None if self.edits == [] else len(self.edits)
 
     @property
     def awards(self) -> List[str]:
@@ -48,7 +40,7 @@ class CommentParser:
 
         awards = []
 
-        for edit_txt in self.edit_txts:
+        for edit_txt in self.edits:
             match = re.search(self.award_pattern, edit_txt)
 
             if match is not None:
@@ -66,7 +58,7 @@ class CommentParser:
         # check if edits exist so that no extra newlines are added
         edits = "\n\n" + "\n\n".join(
             f'edit{"" if num==0 else num+1}. {text}'
-            for num, text in enumerate(self.edits)) if list(self.edits) else ""
+            for num, text in enumerate(self.edits)) if self.edits else ""
         middle = edits + "\n\n"
 
         full_txt = f"{self.main_text}{middle}{self.small_text}"

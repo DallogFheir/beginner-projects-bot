@@ -22,7 +22,7 @@ REPLY_TO_PRAISE_TEXT = """Praise for the food is praise for the cook.
 
 Thanks from the programmer."""
 
-REPLY_TO_CRITIQUE_TEXT = """:(
+REPLY_TO_CRITICISM_TEXT = """:(
 
 I'm open to criticism, please message me and tell me what you don't like about me.
 """
@@ -58,6 +58,6 @@ TITLE_PATTERN = re.compile(_title_text,re.I|re.X)
 _praise_text = "good bot[.!]?"
 PRAISE_PATTERN = re.compile(_praise_text,re.I)
 
-_critique_text = "bad bot[.!]?"
-CRITIQUE_PATTERN = re.compile(_critique_text,re.I)
+_criticism_text = "bad bot[.!]?"
+CRITICISM_PATTERN = re.compile(_criticism_text,re.I)
 #endregion

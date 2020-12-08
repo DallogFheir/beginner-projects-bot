@@ -39,9 +39,9 @@ class BPB:
         # import constants
         self.award_text = texts.AWARD_TEXT
         self.reply_to_praise_text = texts.REPLY_TO_PRAISE_TEXT
-        self.reply_to_critique_text = texts.REPLY_TO_CRITIQUE_TEXT
+        self.reply_to_criticism_text = texts.REPLY_TO_CRITICISM_TEXT
         self.praise_pattern = texts.PRAISE_PATTERN
-        self.critique_pattern = texts.CRITIQUE_PATTERN
+        self.criticism_pattern = texts.CRITICISM_PATTERN
         self.title_pattern = texts.TITLE_PATTERN
         self.upvotes_ranges = texts.UPVOTES_TEXTS
         self.reply_text = texts.MAIN_TEXT + "\n\n" + texts.SMALL_TEXT
@@ -122,7 +122,7 @@ class BPB:
                 if self.delete_downvoted_comment(comment):
                     continue
                 # ignore reply to praise comments
-                if comment.body not in (self.reply_to_praise_text, self.reply_to_critique_text):
+                if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text):
                     self.edit_comment(comment)
                 self.reply_to_judgment(comment)
 
@@ -172,15 +172,15 @@ class BPB:
                         reply.upvote()
 
                     self.logger.info(f"{self.debug_str}Replied to praise: {self.url + cur_reply.permalink}.")
-                elif re.match(self.critique_pattern,reply.body):
+                elif re.match(self.criticism_pattern,reply.body):
                     # for log
                     cur_reply = reply
 
                     if not self.debug:
-                        cur_reply = reply.reply(self.reply_to_critique_text)
+                        cur_reply = reply.reply(self.reply_to_criticism_text)
                         reply.upvote()
 
-                    self.logger.info(f"{self.debug_str}Replied to critique: {self.url + cur_reply.permalink}.")
+                    self.logger.info(f"{self.debug_str}Replied to criticism: {self.url + cur_reply.permalink}.")
     # helpers
     def create_new_text(self,comment : praw.models.Comment) -> str:
         '''
