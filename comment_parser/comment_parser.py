@@ -22,9 +22,7 @@ class CommentParser:
         Adds an edit with passed text.
         '''
 
-        next_edit_num = self.last_edit_num + 1 if self.last_edit_num is not None else 0
-
-        self.edits[next_edit_num] = text
+        self.edits.append(text)
 
     @property
     def last_edit_num(self) -> Union[None, int]:
@@ -40,7 +38,7 @@ class CommentParser:
         Returns the texts of edits.
         '''
 
-        return self.edits.values()
+        return self.edits
 
     @property
     def awards(self) -> List[str]:
@@ -68,7 +66,7 @@ class CommentParser:
         # check if edits exist so that no extra newlines are added
         edits = "\n\n" + "\n\n".join(
             f'edit{"" if num==0 else num+1}. {text}'
-            for num, text in self.edits.items()) if list(self.edits) else ""
+            for num, text in enumerate(self.edits)) if list(self.edits) else ""
         middle = edits + "\n\n"
 
         full_txt = f"{self.main_text}{middle}{self.small_text}"
@@ -92,20 +90,15 @@ class CommentParser:
                     first_edit = index
 
                 last_edit = index
-            # gets the ending small text index
-            elif line.startswith("^"):
-                small_txt_index = index
 
-        edits = {}
+        edits = []
         if last_edit is not None:
-            # splits edits into number : text dict
-            # { None : "thanks", 1 : "thanks2"} etc.
+            # get edits
             for line in lines[first_edit:last_edit+1]:
                 # ignore empty lines
                 if line:
-                    edit_num, edit_txt = re.search(r"edit(\d)*\. (.*)",line).groups()
+                    edit_txt = re.search(r"edit\d*\. (.*)",line).group(1)
 
-                    # replaces None with 0 for getting next edit number easily
-                    edits[int(edit_num) if edit_num is not None else 0] = edit_txt
+                    edits.append(edit_txt)
     
         return edits

@@ -8,6 +8,8 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.2.1
+  - fixed wrong edit numbers
 - 3.2.0
   - bot now responds to "bad bot" comments too
   - fixed dead link

@@ -1,11 +1,13 @@
 #region IMPORTS
 from comment_parser import CommentParser, texts
-from concurrent.futures import ThreadPoolExecutor
+import concurrent.futures
 import logging
+import logging.config
 import praw
+from pathlib import Path
 import re
+import traceback
 from typing import Union
-import utils.logger
 #endregion
 
 class BPB:
@@ -21,7 +23,9 @@ class BPB:
         * [optional] limit - how many comments/submissions are checked
         '''
         # logging
-        self.logger = logging.getLogger("logger")
+        log_path = Path("utils", "logging.conf")
+        logging.config.fileConfig(log_path)
+        self.logger = logging.getLogger("root")
         self.logger.setLevel(logging_level)
 
         # reads config from env vars
@@ -53,12 +57,18 @@ class BPB:
         Starts the bot's functionality in 2 threads.
         '''
 
-        with ThreadPoolExecutor() as e:
-            self.submission_traverser = e.submit(self.traverse_new_submissions)
+        with concurrent.futures.ThreadPoolExecutor() as e:
+            submission_traverser = e.submit(self.traverse_new_submissions)
             self.logger.info("Initialized submission traverser thread.")
 
-            self.comment_traverser = e.submit(self.traverse_own_comments)
+            comment_traverser = e.submit(self.traverse_own_comments)
             self.logger.info("Initialized comment traverser thread.")
+
+            for thread in concurrent.futures.as_completed([submission_traverser, comment_traverser]):
+                try:
+                    thread.result()
+                except:
+                    self.logger.critical(f"Unexpected exception happened. {traceback.format_exc()}")
     def traverse_new_submissions(self):
         '''
         Traverses new submissions in r/learnpython and replies to them.
@@ -112,7 +122,7 @@ class BPB:
                 if self.delete_downvoted_comment(comment):
                     continue
                 # ignore reply to praise comments
-                if comment.body != self.reply_to_praise_text:
+                if comment.body not in (self.reply_to_praise_text, self.reply_to_critique_text):
                     self.edit_comment(comment)
                 self.reply_to_judgment(comment)
 
