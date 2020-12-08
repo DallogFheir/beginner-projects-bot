@@ -6,6 +6,7 @@ import texts
 class TestTexts(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
+        # loads test patterns from test_data
         text_dict = {}
 
         for file in Path("test_data").iterdir():
