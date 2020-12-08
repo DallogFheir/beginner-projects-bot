@@ -191,7 +191,7 @@ class BPB:
         
         # adds edits for upvotes
         for score, text in self.upvotes_ranges.items():
-            if comment.score >= int(score) and text not in parsed_comment.edit_txts:
+            if comment.score >= int(score) and text not in parsed_comment.edits:
                 parsed_comment.add_edit(text)
 
         # adds edits for awards
