@@ -28,6 +28,10 @@ I'm open to criticism, please message me and tell me what you don't like about m
 """
 #endregion
 
+#region HUMAN COMMENT TEXT
+HUMAN_COMMENT_TEXT = "beep boop I'm a human"
+#endregion
+
 #region REGEX PATTERNS
 AWARD_TEXT = "Thank you for the (.*), kind stranger!"
 AWARD_PATTERN = re.compile(AWARD_TEXT)

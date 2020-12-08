@@ -8,6 +8,8 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.2.3
+  - prevented bot from editing comments starting with "beep boop I'm a human"
 - 3.2.2
   - added more unit tests
 - 3.2.1

@@ -45,6 +45,7 @@ class BPB:
         self.title_pattern = texts.TITLE_PATTERN
         self.upvotes_ranges = texts.UPVOTES_TEXTS
         self.reply_text = texts.MAIN_TEXT + "\n\n" + texts.SMALL_TEXT
+        self.human_comment_text = texts.HUMAN_COMMENT_TEXT
 
         # config
         self.debug = debug
@@ -121,9 +122,11 @@ class BPB:
 
                 if self.delete_downvoted_comment(comment):
                     continue
+                
                 # ignore reply to praise comments
-                if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text):
+                if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text) and not comment.body.startswith(self.human_comment_text):
                     self.edit_comment(comment)
+                
                 self.reply_to_judgment(comment)
 
     # COMMENT MANIPULATION METHODS
