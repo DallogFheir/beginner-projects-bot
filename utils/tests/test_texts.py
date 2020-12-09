@@ -9,7 +9,7 @@ class TestTexts(unittest.TestCase):
         # loads test patterns from test_data
         text_dict = {}
 
-        for file in Path("utils", "tests","test_data").iterdir():
+        for file in Path("utils", "tests", "test_data").iterdir():
             with open(file,encoding="utf-8") as f:
                 text_dict[file.stem] = [line.strip() for line in f.readlines()]
 

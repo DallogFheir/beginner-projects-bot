@@ -3,12 +3,10 @@ from utils.argparser import parser
 import re
 
 #region get version from README.md
-regex = re.compile(r"""## Changelog
-
-- (\d+\.\d+\.\d+)""")
+version_pattern = re.compile(r"## Changelog\n\n- (\d+\.\d+\.\d+)")
 
 with open("README.md") as f:
-    version = re.search(regex,f.read()).group(1)
+    version = re.search(version_pattern,f.read()).group(1)
 #endregion
 
 USER_AGENT = f"script:beginner-projects-bot:v{version} (by /u/DallogFheir)"
