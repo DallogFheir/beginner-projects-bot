@@ -1,6 +1,5 @@
 from bpb import BPB
 from utils.argparser import parser
-from pynput import keyboard
 import re
 
 #region CONFIG
@@ -13,14 +12,19 @@ args = parser.parse_args()
 #endregion
 
 #region KEYBOARD LISTENER
-def on_release(key):
-    if key.char=="s":
-        bot.stop()
+try:
+    from pynput import keyboard
 
-        # return to stop listener
-        return False
+    def on_release(key):
+        if key.char=="s":
+            bot.stop()
 
-keyboard.Listener(on_release=on_release).start()
+            # return to stop listener
+            return False
+
+    keyboard.Listener(on_release=on_release).start()
+except ImportError:
+    pass
 #endregion
 
 bot = BPB(USER_AGENT,**vars(args))
