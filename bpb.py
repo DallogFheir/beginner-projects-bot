@@ -1,9 +1,11 @@
 #region IMPORTS
 from comment_parser import CommentParser, texts
 import concurrent.futures
+from threading import Lock
 import logging
 import logging.config
 import praw
+import prawcore
 from pathlib import Path
 import re
 import traceback
@@ -51,12 +53,18 @@ class BPB:
         self.debug = debug
         self.debug_str = "(DEBUG MODE) " if debug else ""
         self.limit = limit
+        
+        # locks
+        self.running_lock = Lock()
+        self.comment_traverser_lock = Lock()
+        self.submission_traverser_lock = Lock()
 
     # MAIN METHODS
     def start(self):
         '''
         Starts the bot's functionality in 2 threads.
         '''
+        self.running = True
 
         with concurrent.futures.ThreadPoolExecutor() as e:
             submission_traverser = e.submit(self.traverse_new_submissions)
@@ -68,15 +76,44 @@ class BPB:
             for thread in concurrent.futures.as_completed([submission_traverser, comment_traverser]):
                 try:
                     thread.result()
+                except prawcore.exceptions.ServerError:
+                    self.logger.warning("ServerError happened. Restarting...")
+                    self.stop()
+                    self.start()
                 except:
                     self.logger.critical(f"Unexpected exception happened. {traceback.format_exc()}")
+                    self.stop()
+    def stop(self):
+        with self.running_lock:
+            self.running = False
+
+        ct_ended_local = False
+        st_ended_local = False
+        while not ct_ended_local or not st_ended_local:
+            with self.comment_traverser_lock:
+                ct_ended_local = self.comment_traverser_ended
+            with self.submission_traverser_lock:
+                st_ended_local = self.submission_traverser_ended
+
+        self.logger.info("Stopped.")
     def traverse_new_submissions(self):
         '''
         Traverses new submissions in r/learnpython and replies to them.
         '''
+        with self.submission_traverser_lock:
+            self.submission_traverser_ended = False
 
         count = 0
-        for post in self.sub.stream.submissions():
+        # pause_after to yield None and not stop the for loop
+        for post in self.sub.stream.submissions(pause_after=1):
+            # check if should still run
+            with self.running_lock:
+                if not self.running:
+                    break
+
+            if post is None:
+                continue
+
             count += 1
             limit_str = ""
 
@@ -99,13 +136,21 @@ class BPB:
                     post.upvote()
 
                 self.logger.info(f"{self.debug_str}Replied to submission: {self.url + cur_reply.permalink}")
+    
+        with self.submission_traverser_lock:
+            self.submission_traverser_ended = True
     def traverse_own_comments(self):
         '''
         Traverses the bot's comments and edits or deletes them, and replies to "good bot" replies.
         '''
+        with self.comment_traverser_lock:
+            self.comment_traverser_ended = False
 
         count = 0
-        while True:
+        with self.running_lock:
+            running = self.running
+
+        while running:
             self.logger.debug(f"Started comment traverser loop.")
 
             for comment in self.bot.comments.new(limit=None):
@@ -129,6 +174,14 @@ class BPB:
                 
                 self.reply_to_judgment(comment)
 
+                # check if should still run
+                with self.running_lock:
+                    if not self.running:
+                        running = self.running
+                        break
+
+        with self.comment_traverser_lock:
+            self.comment_traverser_ended = True
     # COMMENT MANIPULATION METHODS
     def delete_downvoted_comment(self, comment : praw.models.Comment) -> bool:
         '''

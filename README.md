@@ -8,6 +8,9 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.3.0
+  - added a proper method to stop the bot
+  - added a block to catch ServerError
 - 3.2.3
   - prevented bot from editing comments starting with "beep boop I'm a human"
 - 3.2.2
