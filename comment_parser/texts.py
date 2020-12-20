@@ -52,7 +52,9 @@ _title_text = r"""^(?!.*troubleshooting)
 ) |
 (
     (\bproject(s)?\b|\bprogram(s)?\b)
+    (\ to\ do)?
     \ for\ 
+    (a\ )?
     (\bbeg(g)?i(n)?ner(s)?\b|\bbegi(n)?ning\b)
 )
 )
