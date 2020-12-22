@@ -8,6 +8,7 @@ import praw
 import prawcore
 from pathlib import Path
 import re
+import threading
 import traceback
 from typing import Union
 #endregion
@@ -76,8 +77,18 @@ class BPB:
             for thread in concurrent.futures.as_completed([submission_traverser, comment_traverser]):
                 try:
                     thread.result()
-                except prawcore.exceptions.ServerError:
+                # except prawcore.exceptions.ServerError:
+                except ZeroDivisionError:
                     self.logger.warning("ServerError happened. Restarting...")
+
+                    # stops method that raised error
+                    if thread==submission_traverser:
+                        with self.submission_traverser_lock:
+                            self.submission_traverser_ended = True
+                    elif thread==comment_traverser:
+                        with self.comment_traverser_lock:
+                            self.comment_traverser_ended = True
+
                     self.stop()
                     self.start()
                 except:
@@ -102,7 +113,6 @@ class BPB:
         '''
         with self.submission_traverser_lock:
             self.submission_traverser_ended = False
-
         count = 0
         # pause_after to yield None and not stop the for loop
         for post in self.sub.stream.submissions(pause_after=1):
