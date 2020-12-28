@@ -36,7 +36,8 @@ HUMAN_COMMENT_TEXT = "beep boop I'm a human"
 AWARD_TEXT = "Thank you for the (.*), kind stranger!"
 AWARD_PATTERN = re.compile(AWARD_TEXT)
 
-_title_text = r"""^(?!.*troubleshooting)
+_title_text = r"""^(?!.*troubleshooting.*)
+^(?!.*\d+.*)
 (
 .*
 (

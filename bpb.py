@@ -77,7 +77,7 @@ class BPB:
             for thread in concurrent.futures.as_completed([submission_traverser, comment_traverser]):
                 try:
                     thread.result()
-                except prawcore.exceptions.ServerError:
+                except (prawcore.exceptions.ServerError, prawcore.exceptions.ResponseException):
                     self.logger.warning("ServerError happened. Restarting...")
 
                     # stops method that raised error
