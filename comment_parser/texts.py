@@ -36,8 +36,8 @@ HUMAN_COMMENT_TEXT = "beep boop I'm a human"
 AWARD_TEXT = "Thank you for the (.*), kind stranger!"
 AWARD_PATTERN = re.compile(AWARD_TEXT)
 
-_title_text = r"""^(?!.*troubleshooting.*)
-^(?!.*\d+.*)
+_title_text = r"""^(?!.*troubleshooting.*) # ignore questions about troubleshooting beginner projects
+^(?!.*\d+.*) # ignore listicles "top 10 python beginner projects"
 (
 .*
 (
@@ -45,11 +45,11 @@ _title_text = r"""^(?!.*troubleshooting.*)
     (\bsimple\ program(s)?\ idea(s)?\b)
 ) |
 (
-    (\bbeg(g)?i(n)?ner(s)?\b|\bsimple\b)
+    (\bbeg(g)?i(n)?ner(s)?(/\w+)?\b|\bsimple\b)
     \ 
     (\w*\ )?
     (\bproject(s)?\b)
-    (?!.*done)
+    (?!.*done) # ignore posts "my beginner project is done"
 ) |
 (
     (\bproject(s)?\b|\bprogram(s)?\b)
