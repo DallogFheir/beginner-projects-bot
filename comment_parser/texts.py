@@ -28,6 +28,10 @@ I'm open to criticism, please message me and tell me what you don't like about m
 """
 #endregion
 
+#region REPLY TO COMPETITION TEXT
+REPLY_TO_COMPETITION_TEXT = """Great minds think alike!"""
+#endregion
+
 #region HUMAN COMMENT TEXT
 HUMAN_COMMENT_TEXT = "beep boop I'm a human"
 #endregion

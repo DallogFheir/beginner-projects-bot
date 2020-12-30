@@ -8,7 +8,6 @@ import praw
 import prawcore
 from pathlib import Path
 import re
-import threading
 import traceback
 from typing import Union
 #endregion
@@ -49,6 +48,7 @@ class BPB:
         self.upvotes_ranges = texts.UPVOTES_TEXTS
         self.reply_text = texts.MAIN_TEXT + "\n\n" + texts.SMALL_TEXT
         self.human_comment_text = texts.HUMAN_COMMENT_TEXT
+        self.reply_to_competition_text = texts.REPLY_TO_COMPETITION_TEXT
 
         # config
         self.debug = debug
@@ -174,9 +174,13 @@ class BPB:
 
                 self.logger.debug(f"Checking a comment: {self.url + comment.permalink}.{limit_str}")
 
+                # check if comment should be deleted
                 if self.delete_downvoted_comment(comment):
                     continue
                 
+                # check if other bot replied
+                self.reply_to_other_bot(comment.submission)
+
                 # ignore reply to praise comments
                 if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text) and not comment.body.startswith(self.human_comment_text):
                     self.edit_comment(comment)
@@ -246,6 +250,17 @@ class BPB:
                         reply.upvote()
 
                     self.logger.info(f"{self.debug_str}Replied to criticism: {self.url + cur_reply.permalink}.")
+    def reply_to_other_bot(self, submission : praw.models.Submission):
+        for comment in submission.comments:
+            if comment.author=="BeginnerProjectBot" and not comment.likes:
+                # for log
+                cur_comment = comment
+
+                if not self.debug:
+                    cur_comment = comment.reply(self.reply_to_competition_text)
+                    comment.upvote()
+
+                self.logger.info(f"{self.debug_str}Replied to competition: {self.url + cur_comment.permalink}")
     # helpers
     def create_new_text(self,comment : praw.models.Comment) -> str:
         '''

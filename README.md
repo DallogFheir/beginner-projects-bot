@@ -8,6 +8,8 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.4.0
+  - added replying to competition
 - 3.3.0
   - added a proper method to stop the bot
   - added a block to catch ServerError
