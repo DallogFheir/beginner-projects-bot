@@ -181,8 +181,8 @@ class BPB:
                 # check if other bot replied
                 self.reply_to_other_bot(comment.submission)
 
-                # ignore reply to praise comments
-                if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text) and not comment.body.startswith(self.human_comment_text):
+                # ignore reply to judgment/reply to other bot comments
+                if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text, self.reply_to_competition_text) and not comment.body.startswith(self.human_comment_text):
                     self.edit_comment(comment)
                 
                 self.reply_to_judgment(comment)
