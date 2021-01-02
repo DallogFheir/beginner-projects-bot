@@ -57,9 +57,11 @@ _title_text = r"""^(?!.*troubleshooting.*) # ignore questions about troubleshoot
 ) |
 (
     (\bproject(s)?\b|\bprogram(s)?\b)
-    (\ to\ do)?
+    (\ ?ideas)?
+    (\ ?to\ ?do)?
     \ for\ 
-    (a\ )?
+    (\ ?a\ ?)?
+    (\ ?complete\ ?)?
     (\bbeg(g)?i(n)?ner(s)?\b|\bbegi(n)?ning\b)
 )
 )
