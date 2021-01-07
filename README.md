@@ -8,6 +8,8 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.5.0
+  - added logging through Pushbullet
 - 3.4.0
   - added replying to competition
 - 3.3.0

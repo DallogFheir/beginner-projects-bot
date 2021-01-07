@@ -1,12 +1,12 @@
 #region IMPORTS
 from comment_parser import CommentParser, texts
 import concurrent.futures
-from threading import Lock
+from utils.logger import LOGGER_CONFIG
 import logging
 import logging.config
+import os
 import praw
 import prawcore
-from pathlib import Path
 import re
 import traceback
 from typing import Union
@@ -24,10 +24,18 @@ class BPB:
         * [optional] debug - for testing without actually editing/replying
         * [optional] limit - how many comments/submissions are checked
         '''
+
         # logging
-        log_path = Path("utils", "logging.conf")
-        logging.config.fileConfig(log_path)
-        self.logger = logging.getLogger("root")
+        # get Pushbullet API key from env vars
+        # if not found, from pushbullet file
+        pb_api_key = os.environ.get("PB_API_KEY")
+        if pb_api_key is None:
+            with open("pushbullet") as f:
+                pb_api_key = f.read()
+        LOGGER_CONFIG.set_api_key(pb_api_key)
+
+        logging.config.dictConfig(LOGGER_CONFIG)
+        self.logger = logging.getLogger("logger")
         self.logger.setLevel(logging_level)
 
         # reads config from env vars
@@ -54,11 +62,6 @@ class BPB:
         self.debug = debug
         self.debug_str = "(DEBUG MODE) " if debug else ""
         self.limit = limit
-        
-        # locks
-        self.running_lock = Lock()
-        self.comment_traverser_lock = Lock()
-        self.submission_traverser_lock = Lock()
 
     # MAIN METHODS
     def start(self):
@@ -74,51 +77,39 @@ class BPB:
             comment_traverser = e.submit(self.traverse_own_comments)
             self.logger.info("Initialized comment traverser thread.")
 
-            for thread in concurrent.futures.as_completed([submission_traverser, comment_traverser]):
+            self.threads = [submission_traverser, comment_traverser]
+
+            for thread in concurrent.futures.as_completed(self.threads):
                 try:
+                    thread_name = "comment traverser" if thread==comment_traverser else "submission traverser"
                     thread.result()
                 except (prawcore.exceptions.ServerError, prawcore.exceptions.ResponseException):
-                    self.logger.warning("ServerError happened. Restarting...")
-
-                    # stops method that raised error
-                    if thread==submission_traverser:
-                        with self.submission_traverser_lock:
-                            self.submission_traverser_ended = True
-                    elif thread==comment_traverser:
-                        with self.comment_traverser_lock:
-                            self.comment_traverser_ended = True
-
+                    self.logger.warning(f"ServerError happened in {thread_name}. Restarting...")
                     self.stop()
                     self.start()
                 except:
-                    self.logger.critical(f"Unexpected exception happened. {traceback.format_exc()}")
+                    self.logger.critical(f"Unexpected exception happened in {thread_name}. {traceback.format_exc()}")
                     self.stop()
+    
     def stop(self):
-        with self.running_lock:
-            self.running = False
+        self.running = False
 
-        ct_ended_local = False
-        st_ended_local = False
-        while not ct_ended_local or not st_ended_local:
-            with self.comment_traverser_lock:
-                ct_ended_local = self.comment_traverser_ended
-            with self.submission_traverser_lock:
-                st_ended_local = self.submission_traverser_ended
+        while any(thread.running() for thread in self.threads):
+            pass
 
         self.logger.info("Stopped.")
+    
     def traverse_new_submissions(self):
         '''
         Traverses new submissions in r/learnpython and replies to them.
         '''
-        with self.submission_traverser_lock:
-            self.submission_traverser_ended = False
+
         count = 0
         # pause_after to yield None and not stop the for loop
         for post in self.sub.stream.submissions(pause_after=1):
             # check if should still run
-            with self.running_lock:
-                if not self.running:
-                    break
+            if not self.running:
+                break
 
             if post is None:
                 continue
@@ -146,20 +137,15 @@ class BPB:
 
                 self.logger.info(f"{self.debug_str}Replied to submission: {self.url + cur_reply.permalink}")
     
-        with self.submission_traverser_lock:
-            self.submission_traverser_ended = True
+        self.logger.info("Correctly terminated submission traverser.")
+
     def traverse_own_comments(self):
         '''
         Traverses the bot's comments and edits or deletes them, and replies to "good bot" replies.
         '''
-        with self.comment_traverser_lock:
-            self.comment_traverser_ended = False
-
+        
         count = 0
-        with self.running_lock:
-            running = self.running
-
-        while running:
+        while self.running:
             self.logger.debug(f"Started comment traverser loop.")
 
             for comment in self.bot.comments.new(limit=None):
@@ -188,13 +174,11 @@ class BPB:
                 self.reply_to_judgment(comment)
 
                 # check if should still run
-                with self.running_lock:
-                    if not self.running:
-                        running = self.running
-                        break
+                if not self.running:
+                    break
 
-        with self.comment_traverser_lock:
-            self.comment_traverser_ended = True
+        self.logger.info("Correctly terminated comment traverser.")
+
     # COMMENT MANIPULATION METHODS
     def delete_downvoted_comment(self, comment : praw.models.Comment) -> bool:
         '''
@@ -211,6 +195,7 @@ class BPB:
             return True
 
         return False
+    
     def edit_comment(self, comment : praw.models.Comment):
         '''
         Edits comment if new comment text is different than old comment text.
@@ -221,6 +206,7 @@ class BPB:
                 comment.edit(new_text)
 
             self.logger.info(f"{self.debug_str}Edited comment: {self.url + comment.permalink}.")
+    
     def reply_to_judgment(self, comment : praw.models.Comment):
         '''
         Replies to "good bot"/"bad bot" comments in replies to the bot's comments.
@@ -250,6 +236,7 @@ class BPB:
                         reply.upvote()
 
                     self.logger.info(f"{self.debug_str}Replied to criticism: {self.url + cur_reply.permalink}.")
+    
     def reply_to_other_bot(self, submission : praw.models.Submission):
         for comment in submission.comments:
             if comment.author=="BeginnerProjectBot" and not comment.likes:
@@ -261,6 +248,7 @@ class BPB:
                     comment.upvote()
 
                 self.logger.info(f"{self.debug_str}Replied to competition: {self.url + cur_comment.permalink}")
+    
     # helpers
     def create_new_text(self,comment : praw.models.Comment) -> str:
         '''
@@ -282,6 +270,7 @@ class BPB:
                 parsed_comment.add_edit(text)
 
         return parsed_comment.body
+    
     def check_title(self,title : str) -> bool:
         '''
         Checks if the title of a post matches the title Regex pattern.
