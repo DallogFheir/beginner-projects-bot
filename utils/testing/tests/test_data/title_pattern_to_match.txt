@@ -16,3 +16,4 @@ Projects to do for a beginner
 Beginner/Intermediate Python Projects / Challenges?
 Need educational project ideas
 Project ideas for a complete beginner?
+Good starter project?

@@ -49,7 +49,7 @@ _title_text = r"""^(?!.*troubleshooting.*) # ignore questions about troubleshoot
     (\bsimple\ program(s)?\ idea(s)?\b)
 ) |
 (
-    (\bbeg(g)?i(n)?ner(s)?(/\w+)?\b|\bsimple\b|\beducational\b)
+    (\bbeg(g)?i(n)?ner(s)?(/\w+)?\b|\bsimple\b|\beducational\b|\bstarter\b)
     \ 
     (\w*\ )?
     (\bproject(s)?\b)
