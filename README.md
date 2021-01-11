@@ -8,6 +8,8 @@ r/learnpython bot for beginner project resources.
 
 ## Changelog
 
+- 3.5.1
+  - added grace period after ServerError is caught
 - 3.5.0
   - added logging through Pushbullet
 - 3.4.0

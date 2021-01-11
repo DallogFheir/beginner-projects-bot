@@ -8,6 +8,7 @@ import os
 import praw
 import prawcore
 import re
+import time
 import traceback
 from typing import Union
 #endregion
@@ -86,6 +87,7 @@ class BPB:
                 except (prawcore.exceptions.ServerError, prawcore.exceptions.ResponseException):
                     self.logger.warning(f"ServerError happened in {thread_name}. Restarting...")
                     self.stop()
+                    time.sleep(300)
                     self.start()
                 except:
                     self.logger.critical(f"Unexpected exception happened in {thread_name}. {traceback.format_exc()}")
