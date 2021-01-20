@@ -1,1 +1,1 @@
-from comment_parser.comment_parser import CommentParser
+from .comment_parser import CommentParser

@@ -40,32 +40,50 @@ HUMAN_COMMENT_TEXT = "beep boop I'm a human"
 AWARD_TEXT = "Thank you for the (.*), kind stranger!"
 AWARD_PATTERN = re.compile(AWARD_TEXT)
 
-_title_text = r"""^(?!.*troubleshooting.*) # ignore questions about troubleshooting beginner projects
-^(?!.*\d+.*) # ignore listicles "top 10 python beginner projects"
-(
+_title_text = r"""
+^
+# ignore words
+(?!
+.*troubleshooting
+|
+\d # listicles like 10 beginner projects
+)
+
 .*
+
 (
 (
-    (\bsimple\ program(s)?\ idea(s)?\b)
-) |
+(begg?inn?ers?(/?\w+)?|educational|simple|starter)\  # "beginner/intermediate"
+(\w*\ )?
+projects?
+(?!.*done) # ignore "my beginner project is done"
+)
+|
 (
-    (\bbeg(g)?i(n)?ner(s)?(/\w+)?\b|\bsimple\b|\beducational\b|\bstarter\b)
-    \ 
-    (\w*\ )?
-    (\bproject(s)?\b)
-    (?!.*done) # ignore posts "my beginner project is done"
-) |
+simple\ 
+programs?\ 
+ideas?
+)
+|
 (
-    (\bproject(s)?\b|\bprogram(s)?\b)
-    (\ ?ideas)?
-    (\ ?to\ ?do)?
-    \ for\ 
-    (\ ?a\ ?)?
-    (\ ?complete\ ?)?
-    (\bbeg(g)?i(n)?ner(s)?\b|\bbegi(n)?ning\b)
+(projects?|programs?)\ 
+(ideas?\ )?
+(to\ do\ )?
+for\ 
+(a\ )?
+(complete\ )?
+begg?inn?ers?|begg?inn?ing
+)
+|
+(
+what\ 
+projects?\ 
+(can|for)\ 
+(a\ )?
+begg?inn?ers?
 )
 )
-)"""
+"""
 TITLE_PATTERN = re.compile(_title_text,re.I|re.X)
 
 _praise_text = "good bot[.!]?"

@@ -126,7 +126,7 @@ class BPB:
                     self.logger.debug("Stopped submission traverser thread.")
                     return
             
-            self.logger.debug(f"Checking a new post: {self.url + post.permalink}.{limit_str}")
+            self.logger.debug(f"Checking a new post: {post.title} ({self.url + post.permalink}).{limit_str}")
 
             # ignore if already upvoted (to make sure bot doesn't comment on the same post again)
             if self.check_title(post.title) and not post.likes:
