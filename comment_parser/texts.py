@@ -41,48 +41,48 @@ AWARD_TEXT = "Thank you for the (.*), kind stranger!"
 AWARD_PATTERN = re.compile(AWARD_TEXT)
 
 _title_text = r"""
-^
-# ignore words
-(?!
-.*troubleshooting
-|
-\d # listicles like 10 beginner projects
-)
+    ^
+    # ignore words
+    (?!
+    .*troubleshooting
+    |
+    \d # listicles like 10 beginner projects
+    )
 
-.*
+    .*
 
-(
-(
-(begg?inn?ers?(/?\w+)?|educational|simple|starter)\  # "beginner/intermediate"
-(\w*\ )?
-projects?
-(?!.*done) # ignore "my beginner project is done"
-)
-|
-(
-simple\ 
-programs?\ 
-ideas?
-)
-|
-(
-(projects?|programs?)\ 
-(ideas?\ )?
-(to\ do\ )?
-for\ 
-(a\ )?
-(complete\ )?
-begg?inn?ers?|begg?inn?ing
-)
-|
-(
-what\ 
-projects?\ 
-(can|for)\ 
-(a\ )?
-begg?inn?ers?
-)
-)
+    (
+    (
+    (begg?inn?ers?(/?\w+)?|educational|simple|starter)\  # "beginner/intermediate"
+    (\w*\ )?
+    projects?
+    (?!.*done) # ignore "my beginner project is done"
+    )
+    |
+    (
+    simple\ 
+    programs?\ 
+    ideas?
+    )
+    |
+    (
+    (projects?|programs?)\ 
+    (ideas?\ )?
+    (to\ do\ )?
+    for\ 
+    (a\ )?
+    (complete\ )?
+    (begg?inn?ers?|begg?inn?ing)
+    )
+    |
+    (
+    what\ 
+    projects?\ 
+    (can|for)\ 
+    (a\ )?
+    begg?inn?ers?
+    )
+    )
 """
 TITLE_PATTERN = re.compile(_title_text,re.I|re.X)
 
