@@ -81,8 +81,8 @@ class BPB:
             self.threads = [submission_traverser, comment_traverser]
 
             for thread in concurrent.futures.as_completed(self.threads):
+                thread_name = "comment traverser" if thread==comment_traverser else "submission traverser"
                 try:
-                    thread_name = "comment traverser" if thread==comment_traverser else "submission traverser"
                     thread.result()
                 except (prawcore.exceptions.ServerError, prawcore.exceptions.ResponseException):
                     self.logger.warning(f"ServerError happened in {thread_name}. Restarting...")
