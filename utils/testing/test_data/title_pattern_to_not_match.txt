@@ -1,3 +1,4 @@
 my beginner project is done
 Help Troubleshooting Beginner Python Project
 21 python projects for beginners
+Blackjack - Beginner OOP project

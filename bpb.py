@@ -85,7 +85,7 @@ class BPB:
                 try:
                     thread.result()
                 except (prawcore.exceptions.ServerError, prawcore.exceptions.ResponseException):
-                    self.logger.warning(f"ServerError happened in {thread_name}. Restarting...")
+                    self.logger.info(f"ServerError happened in {thread_name}. Restarting...")
                     self.stop()
                     time.sleep(300)
                     self.start()
@@ -191,7 +191,7 @@ class BPB:
             if not self.debug:
                 comment.delete()
             
-            self.logger.info(f"{self.debug_str}Deleted comment: {self.url+comment.permalink}.")
+            self.logger.warning(f"{self.debug_str}Deleted comment: {self.url+comment.permalink}.")
 
             # return for condition in traverse_own_comments
             return True

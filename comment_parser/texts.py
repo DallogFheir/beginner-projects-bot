@@ -47,6 +47,8 @@ _title_text = r"""
     .*troubleshooting
     |
     \d # listicles like 10 beginner projects
+    |
+    blackjack
     )
 
     .*
