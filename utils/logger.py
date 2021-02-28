@@ -33,7 +33,7 @@ LOGGER_CONFIG = ConfDict({
         },
         "pushbullet_handler" : {
             "class" : "utils.logger.PushbulletHandler",
-            "level" : "CRITICAL",
+            "level" : "WARNING",
             "formatter" : "formatter",
             "api_key" : None,
             "title" : "BPB log"

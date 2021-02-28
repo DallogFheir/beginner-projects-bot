@@ -47,13 +47,15 @@ _title_text = r"""
     .*troubleshooting
     |
     \d # listicles like 10 beginner projects
+    |
+    blackjack
     )
 
     .*
 
     (
     (
-    (begg?inn?ers?(/?\w+)?|educational|simple|starter)\  # "beginner/intermediate"
+    (begg?inn?ers?(/?\w+)?|educational|simple|starter|easy)\  # "beginner/intermediate"
     (\w*\ )?
     projects?
     (?!.*done) # ignore "my beginner project is done"

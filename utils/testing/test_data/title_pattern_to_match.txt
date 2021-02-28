@@ -18,3 +18,4 @@ Need educational project ideas
 Project ideas for a complete beginner?
 Good starter project?
 What projects can a beginner make?
+First easy python projects
