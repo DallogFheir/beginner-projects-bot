@@ -2,9 +2,13 @@
 
 r/learnpython bot for beginner project resources.
 
-- checks new submissions in the r/learnpython subreddit and replies to those asking for some beginner projects
+- checks new submissions in the [r/learnpython](https://www.reddit.com/r/learnpython/) subreddit and replies to those asking for some beginner projects
 - edits the comment to thank for upvotes and/or awards
 - deletes the comment if downvoted
+- replies to praise and criticism
+- replies to [u/BeginnerProjectBot](https://www.reddit.com/user/BeginnerProjectBot) when it replied to the same submission
+
+Profile: [u/BeginnerProjectsBot](https://www.reddit.com/user/BeginnerProjectsBot).
 
 ## Changelog
 
