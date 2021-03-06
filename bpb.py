@@ -1,4 +1,4 @@
-#region IMPORTS
+# region IMPORTS
 from comment_parser import CommentParser, texts
 import concurrent.futures
 from utils.logger import LOGGER_CONFIG
@@ -11,20 +11,28 @@ import re
 import time
 import traceback
 from typing import Union
-#endregion
+
+# endregion
+
 
 class BPB:
     url = "https://www.reddit.com"
 
-    def __init__(self,user_agent:str,debug:bool=False,limit:Union[int,None]=None,logging_level:str="INFO"):
-        '''
+    def __init__(
+        self,
+        user_agent: str,
+        debug: bool = False,
+        limit: Union[int, None] = None,
+        logging_level: str = "INFO",
+    ):
+        """
         A Reddit bot to respond to submissions on r/learnpython asking for beginner projects.
 
         Arguments:
         * user_agent
         * [optional] debug - for testing without actually editing/replying
         * [optional] limit - how many comments/submissions are checked
-        '''
+        """
 
         # logging
         # get Pushbullet API key from env vars
@@ -45,7 +53,9 @@ class BPB:
 
         self.sub = self.reddit.subreddit("learnpython")
         self.bot = self.reddit.redditor("BeginnerProjectsBot")
-        self.logger.info(f"Initialized bot with debug={debug}, limit={limit}, logging level={logging_level}.")
+        self.logger.info(
+            f"Initialized bot with debug={debug}, limit={limit}, logging level={logging_level}."
+        )
 
         # import constants
         self.award_text = texts.AWARD_TEXT
@@ -66,9 +76,9 @@ class BPB:
 
     # MAIN METHODS
     def start(self):
-        '''
+        """
         Starts the bot's functionality in 2 threads.
-        '''
+        """
         self.running = True
 
         with concurrent.futures.ThreadPoolExecutor() as e:
@@ -81,18 +91,29 @@ class BPB:
             self.threads = [submission_traverser, comment_traverser]
 
             for thread in concurrent.futures.as_completed(self.threads):
-                thread_name = "comment traverser" if thread==comment_traverser else "submission traverser"
+                thread_name = (
+                    "comment traverser"
+                    if thread == comment_traverser
+                    else "submission traverser"
+                )
                 try:
                     thread.result()
-                except (prawcore.exceptions.ServerError, prawcore.exceptions.ResponseException):
-                    self.logger.info(f"ServerError happened in {thread_name}. Restarting...")
+                except (
+                    prawcore.exceptions.ServerError,
+                    prawcore.exceptions.ResponseException,
+                ):
+                    self.logger.info(
+                        f"ServerError happened in {thread_name}. Restarting..."
+                    )
                     self.stop()
                     time.sleep(300)
                     self.start()
                 except:
-                    self.logger.critical(f"Unexpected exception happened in {thread_name}. {traceback.format_exc()}")
+                    self.logger.critical(
+                        f"Unexpected exception happened in {thread_name}. {traceback.format_exc()}"
+                    )
                     self.stop()
-    
+
     def stop(self):
         self.running = False
 
@@ -100,11 +121,11 @@ class BPB:
             pass
 
         self.logger.info("Stopped.")
-    
+
     def traverse_new_submissions(self):
-        '''
+        """
         Traverses new submissions in r/learnpython and replies to them.
-        '''
+        """
 
         count = 0
         # pause_after to yield None and not stop the for loop
@@ -125,8 +146,10 @@ class BPB:
                 if count > self.limit:
                     self.logger.debug("Stopped submission traverser thread.")
                     return
-            
-            self.logger.debug(f"Checking a new post: {post.title} ({self.url + post.permalink}).{limit_str}")
+
+            self.logger.debug(
+                f"Checking a new post: {post.title} ({self.url + post.permalink}).{limit_str}"
+            )
 
             # ignore if already upvoted (to make sure bot doesn't comment on the same post again)
             if self.check_title(post.title) and not post.likes:
@@ -137,82 +160,89 @@ class BPB:
                     cur_reply = post.reply(self.reply_text)
                     post.upvote()
 
-                self.logger.info(f"{self.debug_str}Replied to submission: {self.url + cur_reply.permalink}")
-    
+                self.logger.info(
+                    f"{self.debug_str}Replied to submission: {self.url + cur_reply.permalink}"
+                )
+
         self.logger.info("Correctly terminated submission traverser.")
 
     def traverse_own_comments(self):
-        '''
+        """
         Traverses the bot's comments and edits or deletes them, and replies to "good bot" replies.
-        '''
-        
+        """
         count = 0
         while self.running:
             self.logger.debug(f"Started comment traverser loop.")
 
             for comment in self.bot.comments.new(limit=None):
-                limit_str = ""
-                count += 1
-                if self.limit is not None:
-                    limit_str = f" Comment count: {count}."
-
-                    if count > self.limit:
-                        self.logger.debug("Stopped comment traverser thread.")
-                        return
-
-                self.logger.debug(f"Checking a comment: {self.url + comment.permalink}.{limit_str}")
-
-                # check if comment should be deleted
-                if self.delete_downvoted_comment(comment):
-                    continue
-                
-                # check if other bot replied
-                self.reply_to_other_bot(comment.submission)
-
                 # ignore reply to judgment/reply to other bot comments
                 if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text, self.reply_to_competition_text) and not comment.body.startswith(self.human_comment_text):
-                    self.edit_comment(comment)
-                
-                self.reply_to_judgment(comment)
+                    limit_str = ""
+                    count += 1
+                    if self.limit is not None:
+                        limit_str = f" Comment count: {count}."
 
-                # check if should still run
-                if not self.running:
-                    break
+                        if count > self.limit:
+                            self.logger.debug("Stopped comment traverser thread.")
+                            return
+
+                    self.logger.debug(
+                        f"Checking a comment: {self.url + comment.permalink}.{limit_str}"
+                    )
+
+                    # check if comment should be deleted
+                    if self.delete_downvoted_comment(comment):
+                        continue
+
+                    # check if other bot replied
+                    self.reply_to_other_bot(comment.submission)
+
+                    self.edit_comment(comment)
+
+                    self.reply_to_judgment(comment)
+
+                    # check if should still run
+                    if not self.running:
+                        break
 
         self.logger.info("Correctly terminated comment traverser.")
 
     # COMMENT MANIPULATION METHODS
-    def delete_downvoted_comment(self, comment : praw.models.Comment) -> bool:
-        '''
+    def delete_downvoted_comment(self, comment: praw.models.Comment) -> bool:
+        """
         Deletes comment with score less than 0.
-        '''
+        """
 
         if comment.score < 0:
             if not self.debug:
                 comment.delete()
-            
-            self.logger.warning(f"{self.debug_str}Deleted comment: {self.url+comment.permalink}.")
+
+            self.logger.warning(
+                f"{self.debug_str}Deleted comment: {self.url+comment.permalink}."
+            )
 
             # return for condition in traverse_own_comments
             return True
 
         return False
-    
-    def edit_comment(self, comment : praw.models.Comment):
-        '''
+
+    def edit_comment(self, comment: praw.models.Comment):
+        """
         Edits comment if new comment text is different than old comment text.
-        '''
+        """
         new_text = self.create_new_text(comment)
         if new_text != comment.body:
             if not self.debug:
                 comment.edit(new_text)
 
-            self.logger.info(f"{self.debug_str}Edited comment: {self.url + comment.permalink}.")
-    
-    def reply_to_judgment(self, comment : praw.models.Comment):
-        '''
+            self.logger.info(
+                f"{self.debug_str}Edited comment: {self.url + comment.permalink}."
+            )
+
+    def reply_to_judgment(self, comment: praw.models.Comment):
+        """
         Replies to "good bot"/"bad bot" comments in replies to the bot's comments.
-        '''
+        """
 
         # needs to refresh to get replies
         comment.refresh()
@@ -220,7 +250,7 @@ class BPB:
         for reply in comment.replies:
             # ignore already upvoted replies
             if not reply.likes:
-                if re.match(self.praise_pattern,reply.body):
+                if re.match(self.praise_pattern, reply.body):
                     # for log
                     cur_reply = reply
 
@@ -228,8 +258,10 @@ class BPB:
                         cur_reply = reply.reply(self.reply_to_praise_text)
                         reply.upvote()
 
-                    self.logger.info(f"{self.debug_str}Replied to praise: {self.url + cur_reply.permalink}.")
-                elif re.match(self.criticism_pattern,reply.body):
+                    self.logger.info(
+                        f"{self.debug_str}Replied to praise: {self.url + cur_reply.permalink}."
+                    )
+                elif re.match(self.criticism_pattern, reply.body):
                     # for log
                     cur_reply = reply
 
@@ -237,11 +269,13 @@ class BPB:
                         cur_reply = reply.reply(self.reply_to_criticism_text)
                         reply.upvote()
 
-                    self.logger.info(f"{self.debug_str}Replied to criticism: {self.url + cur_reply.permalink}.")
-    
-    def reply_to_other_bot(self, submission : praw.models.Submission):
+                    self.logger.info(
+                        f"{self.debug_str}Replied to criticism: {self.url + cur_reply.permalink}."
+                    )
+
+    def reply_to_other_bot(self, submission: praw.models.Submission):
         for comment in submission.comments:
-            if comment.author=="BeginnerProjectBot" and not comment.likes:
+            if comment.author == "BeginnerProjectBot" and not comment.likes:
                 # for log
                 cur_comment = comment
 
@@ -249,16 +283,18 @@ class BPB:
                     cur_comment = comment.reply(self.reply_to_competition_text)
                     comment.upvote()
 
-                self.logger.info(f"{self.debug_str}Replied to competition: {self.url + cur_comment.permalink}")
-    
+                self.logger.info(
+                    f"{self.debug_str}Replied to competition: {self.url + cur_comment.permalink}"
+                )
+
     # helpers
-    def create_new_text(self,comment : praw.models.Comment) -> str:
-        '''
+    def create_new_text(self, comment: praw.models.Comment) -> str:
+        """
         Creates new comment text based on the number of upvotes and received awards.
-        '''
+        """
 
         parsed_comment = CommentParser(comment.body)
-        
+
         # adds edits for upvotes
         for score, text in self.upvotes_ranges.items():
             if comment.score >= int(score) and text not in parsed_comment.edits:
@@ -268,17 +304,17 @@ class BPB:
         for award in comment.all_awardings:
             name = award["name"]
             if name not in parsed_comment.awards:
-                text = self.award_text.replace("(.*)",name)
+                text = self.award_text.replace("(.*)", name)
                 parsed_comment.add_edit(text)
 
         return parsed_comment.body
-    
-    def check_title(self,title : str) -> bool:
-        '''
+
+    def check_title(self, title: str) -> bool:
+        """
         Checks if the title of a post matches the title Regex pattern.
-        '''
+        """
 
         # checks if title matches regex
-        match = re.search(self.title_pattern,title)
+        match = re.search(self.title_pattern, title)
 
         return False if match is None else True
