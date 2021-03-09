@@ -51,6 +51,8 @@ _title_text = r"""
     \d # listicles like 10 beginner projects
     |
     blackjack
+    |
+    how # ignore questions like "how hard..."
     )
 
     .*
