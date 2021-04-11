@@ -53,6 +53,8 @@ _title_text = r"""
     blackjack
     |
     how # ignore questions like "how hard..."
+    |
+    error
     )
 
     .*
