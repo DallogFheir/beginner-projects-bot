@@ -54,7 +54,7 @@ _title_text = r"""
     |
     how # ignore questions like "how hard..."
     |
-    error
+    .*error
     )
 
     .*
