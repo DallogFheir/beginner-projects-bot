@@ -1,9 +1,17 @@
 import re
 
 # region REPLY TEXT
-MAIN_TEXT = """1. Create a bot to reply to "what are some beginner projects" questions on r/learnpython, using [PRAW](https://praw.readthedocs.io/en/latest/index.html).
+MAIN_TEXT = """1\\. Create a bot to reply to "what are some beginner projects" questions on r/learnpython, using [PRAW](https://praw.readthedocs.io/en/latest/index.html).
 
-Other than that, [here's](https://github.com/karan/Projects) a list of programming projects on Github. [Here's](https://web.archive.org/web/20180612183650if_/https://github.com/jorgegonzalez/beginner-projects) another archived list. Also check out [this resource](https://www.reddit.com/r/learnpython/wiki/index#wiki_tools_for_learning_python) in the subreddit wiki. Good luck!"""
+Other than that, here are some beginner project ideas:
+
+* [a list of programming projects on Github](https://github.com/karan/Projects)
+* [another (archived) list from Github](https://web.archive.org/web/20180612183650if_/https://github.com/jorgegonzalez/beginner-projects)
+* [a curated list of Python projects for beginners, intermediate & advance level programmers](https://www.theinsaneapp.com/2021/06/list-of-python-projects-with-source-code-and-tutorials.html)
+* [Tech with Tim Youtube channel, full of Python projects](https://www.youtube.com/c/TechWithTim/playlists)
+* [resources in the subreddit wiki](https://www.reddit.com/r/learnpython/wiki/index#wiki_tools_for_learning_python)
+
+Good luck!"""
 
 SMALL_TEXT = """^(Downvote me if the post wasn't a question about examples of beginner projects. Thank you.)"""
 # endregion
@@ -46,6 +54,12 @@ _title_text = r"""
     (?!
     .*troubleshooting
     |
+    .*feedback
+    |
+    .*having\ trouble
+    |
+    .*came\ across
+    |
     .*for\ my
     |
     \d # listicles like 10 beginner projects
@@ -58,7 +72,7 @@ _title_text = r"""
     )
 
     .*
-
+    (?<!as\ a\ )
     (
     (
     (begg?inn?ers?(/?\w+)?|educational|simple|starter|easy)\  # "beginner/intermediate"
