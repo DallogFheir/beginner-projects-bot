@@ -8,7 +8,7 @@ Other than that, here are some beginner project ideas:
 * [a list of programming projects on Github](https://github.com/karan/Projects)
 * [another (archived) list from Github](https://web.archive.org/web/20180612183650if_/https://github.com/jorgegonzalez/beginner-projects)
 * [a curated list of Python projects for beginners, intermediate & advance level programmers](https://www.theinsaneapp.com/2021/06/list-of-python-projects-with-source-code-and-tutorials.html)
-* [Tech with Tim Youtube channel, full of Python projects](https://www.youtube.com/c/TechWithTim/playlists)
+* [Tech with Tim Youtube channel, full of Python projects](https://www.youtube.com/playlist?list=PLzMcBGfZo4-lkJOu1AWab-nFtjDw7aPek)
 * [resources in the subreddit wiki](https://www.reddit.com/r/learnpython/wiki/index#wiki_tools_for_learning_python)
 
 Good luck!"""
