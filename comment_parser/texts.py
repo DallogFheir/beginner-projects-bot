@@ -68,6 +68,8 @@ _title_text = r"""
     |
     how # ignore questions like "how hard..."
     |
+    is # ignore questions like "is it a good beginner project?"
+    |
     .*error
     )
 
