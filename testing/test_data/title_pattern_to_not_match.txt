@@ -11,3 +11,4 @@ I am just making a word generator in Python as a simple project. I'm working on 
 Feedback - Simple Webscraping project
 BEGINNER PROJECTS, having trouble building an acronym in python * pls take it easy I'm a beginner*
 If you're looking for Python Projects, I have something to share with you. Just few days ago, I came across this list of 70+ Python Projects for Beginners, Intermediate and Experienced Developers. Hope it will be helpful to all the members of this community.
+Please help...struggling with beginner project. Long post sorry.
