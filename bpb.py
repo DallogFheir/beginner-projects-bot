@@ -176,7 +176,11 @@ class BPB:
 
             for comment in self.bot.comments.new(limit=None):
                 # ignore reply to judgment/reply to other bot comments
-                if comment.body not in (self.reply_to_praise_text, self.reply_to_criticism_text, self.reply_to_competition_text) and not comment.body.startswith(self.human_comment_text):
+                if comment.body not in (
+                    self.reply_to_praise_text,
+                    self.reply_to_criticism_text,
+                    self.reply_to_competition_text,
+                ) and not comment.body.startswith(self.human_comment_text):
                     limit_str = ""
                     count += 1
                     if self.limit is not None:

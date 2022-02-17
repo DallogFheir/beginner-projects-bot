@@ -32,8 +32,7 @@ Thanks from the programmer."""
 
 REPLY_TO_CRITICISM_TEXT = """:(
 
-I'm open to criticism, please message me and tell me what you don't like about me.
-"""
+I'm open to criticism, please message me and tell me what you don't like about me."""
 # endregion
 
 # region REPLY TO COMPETITION TEXT
