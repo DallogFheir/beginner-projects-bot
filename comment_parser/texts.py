@@ -108,6 +108,9 @@ _title_text = r"""
     (a\ )?
     begg?inn?ers?
     )
+    |
+    projects?\ 
+    to\ learn
     )
 """
 TITLE_PATTERN = re.compile(_title_text, re.I | re.X)
