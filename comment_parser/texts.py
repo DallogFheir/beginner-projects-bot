@@ -94,7 +94,7 @@ _title_text = r"""
     )
     |
     (
-    (projects?|programs?)\ 
+    (projects?)\ 
     (ideas?\ )?
     (to\ do\ )?
     for\ 
