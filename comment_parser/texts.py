@@ -85,6 +85,7 @@ _title_text = r"""
     projects?
     (?!:) # ignore "Beginner project: <project>"
     (?!.*done) # ignore "my beginner project is done"
+    (?!.*working.*on)
     )
     |
     (
