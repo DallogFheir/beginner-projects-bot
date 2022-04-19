@@ -113,7 +113,8 @@ _title_text = r"""
     )
     |
     projects?\ 
-    to\ learn
+    (ideas?\ )?
+    to\ (learn|practi(c|s)e)
     )
 """
 TITLE_PATTERN = re.compile(_title_text, re.I | re.X)
