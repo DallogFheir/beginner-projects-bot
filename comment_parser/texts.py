@@ -59,6 +59,8 @@ _title_text = r"""
     |
     .*feedback
     |
+    .*hire
+    |
     .*having\ trouble
     |
     .*came\ across
