@@ -61,6 +61,8 @@ _title_text = r"""
     |
     .*hire
     |
+    .*which\ library
+    |
     .*having\ trouble
     |
     .*came\ across
