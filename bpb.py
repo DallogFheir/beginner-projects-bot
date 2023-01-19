@@ -100,6 +100,7 @@ class BPB:
                     thread.result()
                 except (
                     prawcore.exceptions.ServerError,
+                    prawcore.exceptions.RequestException,
                     prawcore.exceptions.ResponseException,
                 ):
                     self.logger.info(
