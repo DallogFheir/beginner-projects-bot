@@ -53,6 +53,8 @@ _title_text = r"""
     (?!
     .*troubleshooting
     |
+    .*critique
+    |
     .*help
     |
     .*struggling
