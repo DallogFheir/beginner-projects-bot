@@ -107,9 +107,10 @@ _title_text = r"""
     (ideas?\ )?
     (to\ do\ )?
     for\ 
+    (just\ )?
     (a\ )?
     (complete\ )?
-    (begg?inn?ers?|begg?inn?ing)
+    (begg?inn?ers?|begg?inn?ing|starting)
     )
     |
     (

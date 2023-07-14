@@ -21,3 +21,4 @@ What projects can a beginner make?
 First easy python projects
 Projects to learn python
 any project ideas to practice ?
+Projects for just starting to learn python
