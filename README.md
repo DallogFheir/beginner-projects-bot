@@ -1,6 +1,6 @@
 # beginner-projects-bot
 
-[![robot](robot.png)
+![robot](robot.png)
 
 ![testing badge](https://github.com/DallogFheir/beginner-projects-bot/actions/workflows/testing.yml/badge.svg)
 
