@@ -1,7 +1,7 @@
 import inspect
 import unittest
-from comment_parser import CommentParser
-from comment_parser import texts
+from ..comment_parser import CommentParser
+from ..comment_parser import texts
 
 class TestCommentParser(unittest.TestCase):
     @staticmethod

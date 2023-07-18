@@ -1,6 +1,9 @@
 # beginner-projects-bot
 
 [![robot](robot.png)
+
+![testing badge](https://github.com/DallogFheir/beginner-projects-bot/actions/workflows/testing.yml/badge.svg)
+
 u/BeginnerProjectsBot](https://www.reddit.com/user/BeginnerProjectsBot)
 
 r/learnpython bot for beginner project resources.

@@ -1,18 +1,16 @@
-# region IMPORTS
 from comment_parser import CommentParser, texts
-import concurrent.futures
 from utils.logger import LOGGER_CONFIG
+import concurrent.futures
 import logging
 import logging.config
 import os
+from pathlib import Path
 import praw
 import prawcore
 import re
 import time
 import traceback
 from typing import Union
-
-# endregion
 
 
 class BPB:
@@ -39,7 +37,7 @@ class BPB:
         # if not found, from pushbullet file
         pb_api_key = os.environ.get("PB_API_KEY")
         if pb_api_key is None:
-            with open("pushbullet") as f:
+            with open(Path(__file__).parent / "pushbullet") as f:
                 pb_api_key = f.read()
         LOGGER_CONFIG.set_api_key(pb_api_key)
 

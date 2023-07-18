@@ -1,7 +1,7 @@
 import inspect
 from pathlib import Path
 import unittest
-from comment_parser import texts
+from ..comment_parser import texts
 
 
 class TestTexts(unittest.TestCase):
@@ -10,7 +10,7 @@ class TestTexts(unittest.TestCase):
         # loads test patterns from test_data
         text_dict = {}
 
-        for file in Path("testing", "test_data").iterdir():
+        for file in (Path(__file__).parent / "test_data").iterdir():
             with open(file, encoding="utf-8") as f:
                 text_dict[file.stem] = [line.strip() for line in f.readlines()]
 

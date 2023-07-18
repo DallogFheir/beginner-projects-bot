@@ -19,3 +19,4 @@ Top 20 Python Projects for Beginners to Master the Language
 I'm looking to hire CUDA/python dev for a simple project.
 Which library to use for simple game project in python
 Critique for Simple Lottery Project Using Classes
+My firs simple project
