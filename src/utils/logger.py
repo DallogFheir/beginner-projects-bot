@@ -22,11 +22,20 @@ class ConfDict(dict):
 LOGGER_CONFIG = ConfDict(
     {
         "version": 1,
-        "formatters": {"formatter": {"format": "%(levelname)s : %(message)s"}},
+        "formatters": {
+            "formatter": {"format": "%(asctime)s : %(levelname)s : %(message)s"}
+        },
         "handlers": {
-            "stream_handler": {
+            "stdout_handler": {
                 "class": "logging.StreamHandler",
+                "stream": "ext://sys.stdout",
                 "level": "DEBUG",
+                "formatter": "formatter",
+            },
+            "stderr_handler": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://sys.stderr",
+                "level": "INFO",
                 "formatter": "formatter",
             },
             "pushbullet_handler": {
@@ -37,6 +46,14 @@ LOGGER_CONFIG = ConfDict(
                 "title": "BPB log",
             },
         },
-        "loggers": {"logger": {"handlers": ["stream_handler", "pushbullet_handler"]}},
+        "loggers": {
+            "stdout_logger": {
+                "handlers": ["stdout_handler", "pushbullet_handler"],
+            },
+            "stderr_logger": {
+                "level": "INFO",
+                "handlers": ["stderr_handler", "pushbullet_handler"],
+            },
+        },
     }
 )

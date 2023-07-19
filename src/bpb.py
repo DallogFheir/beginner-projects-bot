@@ -42,8 +42,10 @@ class BPB:
         LOGGER_CONFIG.set_api_key(pb_api_key)
 
         logging.config.dictConfig(LOGGER_CONFIG)
-        self.logger = logging.getLogger("logger")
-        self.logger.setLevel(logging_level)
+        self.stdout_logger = logging.getLogger("stdout_logger")
+        self.stdout_logger.setLevel(logging_level)
+        self.stderr_logger = logging.getLogger("stderr_logger")
+        self.stderr_logger.setLevel("INFO")
 
         # reads config from env vars
         # if not found, from praw.ini
@@ -51,7 +53,7 @@ class BPB:
 
         self.sub = self.reddit.subreddit("learnpython")
         self.bot = self.reddit.redditor("BeginnerProjectsBot")
-        self.logger.info(
+        self.stdout_logger.info(
             f"Initialized bot with debug={debug}, limit={limit}, logging level={logging_level}."
         )
 
@@ -81,10 +83,10 @@ class BPB:
 
         with concurrent.futures.ThreadPoolExecutor() as e:
             submission_traverser = e.submit(self.traverse_new_submissions)
-            self.logger.info("Initialized submission traverser thread.")
+            self.stdout_logger.info("Initialized submission traverser thread.")
 
             comment_traverser = e.submit(self.traverse_own_comments)
-            self.logger.info("Initialized comment traverser thread.")
+            self.stdout_logger.info("Initialized comment traverser thread.")
 
             self.threads = [submission_traverser, comment_traverser]
 
@@ -101,14 +103,17 @@ class BPB:
                     prawcore.exceptions.RequestException,
                     prawcore.exceptions.ResponseException,
                 ):
-                    self.logger.info(
+                    self.stdout_logger.info(
                         f"ServerError happened in {thread_name}. Restarting..."
+                    )
+                    self.stderr_logger.info(
+                        f"ServerError happened in {thread_name}. {traceback.format_exc()}"
                     )
                     self.stop()
                     time.sleep(300)
                     self.start()
                 except:
-                    self.logger.critical(
+                    self.stderr_logger.critical(
                         f"Unexpected exception happened in {thread_name}. {traceback.format_exc()}"
                     )
                     self.stop()
@@ -119,7 +124,7 @@ class BPB:
         while any(thread.running() for thread in self.threads):
             pass
 
-        self.logger.info("Stopped.")
+        self.stdout_logger.info("Stopped.")
 
     def traverse_new_submissions(self):
         """
@@ -143,10 +148,10 @@ class BPB:
                 limit_str = f" Submission count: {count}."
 
                 if count > self.limit:
-                    self.logger.debug("Stopped submission traverser thread.")
+                    self.stdout_logger.debug("Stopped submission traverser thread.")
                     return
 
-            self.logger.debug(
+            self.stdout_logger.debug(
                 f"Checking a new post: {post.title} ({self.url + post.permalink}).{limit_str}"
             )
 
@@ -159,11 +164,11 @@ class BPB:
                     cur_reply = post.reply(self.reply_text)
                     post.upvote()
 
-                self.logger.info(
+                self.stdout_logger.info(
                     f"{self.debug_str}Replied to submission: {self.url + cur_reply.permalink}"
                 )
 
-        self.logger.info("Correctly terminated submission traverser.")
+        self.stdout_logger.info("Correctly terminated submission traverser.")
 
     def traverse_own_comments(self):
         """
@@ -171,7 +176,7 @@ class BPB:
         """
         count = 0
         while self.running:
-            self.logger.debug(f"Started comment traverser loop.")
+            self.stdout_logger.debug(f"Started comment traverser loop.")
 
             for comment in self.bot.comments.new(limit=None):
                 # ignore reply to judgment/reply to other bot comments
@@ -186,10 +191,12 @@ class BPB:
                         limit_str = f" Comment count: {count}."
 
                         if count > self.limit:
-                            self.logger.debug("Stopped comment traverser thread.")
+                            self.stdout_logger.debug(
+                                "Stopped comment traverser thread."
+                            )
                             return
 
-                    self.logger.debug(
+                    self.stdout_logger.debug(
                         f"Checking a comment: {self.url + comment.permalink}.{limit_str}"
                     )
 
@@ -208,7 +215,7 @@ class BPB:
                     if not self.running:
                         break
 
-        self.logger.info("Correctly terminated comment traverser.")
+        self.stdout_logger.info("Correctly terminated comment traverser.")
 
     # COMMENT MANIPULATION METHODS
     def delete_downvoted_comment(self, comment: praw.models.Comment) -> bool:
@@ -220,7 +227,7 @@ class BPB:
             if not self.debug:
                 comment.delete()
 
-            self.logger.warning(
+            self.stderr_logger.warning(
                 f"{self.debug_str}Deleted comment: {self.url+comment.permalink}."
             )
 
@@ -238,7 +245,7 @@ class BPB:
             if not self.debug:
                 comment.edit(new_text)
 
-            self.logger.info(
+            self.stdout_logger.info(
                 f"{self.debug_str}Edited comment: {self.url + comment.permalink}."
             )
 
@@ -261,7 +268,7 @@ class BPB:
                         cur_reply = reply.reply(self.reply_to_praise_text)
                         reply.upvote()
 
-                    self.logger.info(
+                    self.stdout_logger.info(
                         f"{self.debug_str}Replied to praise: {self.url + cur_reply.permalink}."
                     )
                 elif re.match(self.criticism_pattern, reply.body):
@@ -272,7 +279,7 @@ class BPB:
                         cur_reply = reply.reply(self.reply_to_criticism_text)
                         reply.upvote()
 
-                    self.logger.info(
+                    self.stdout_logger.info(
                         f"{self.debug_str}Replied to criticism: {self.url + cur_reply.permalink}."
                     )
 
@@ -286,7 +293,7 @@ class BPB:
                     cur_comment = comment.reply(self.reply_to_competition_text)
                     comment.upvote()
 
-                self.logger.info(
+                self.stdout_logger.info(
                     f"{self.debug_str}Replied to competition: {self.url + cur_comment.permalink}"
                 )
 

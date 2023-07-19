@@ -2,7 +2,7 @@
 
 ![robot](robot.png)
 
-![testing badge](https://github.com/DallogFheir/beginner-projects-bot/actions/workflows/testing.yml/badge.svg)
+[![testing badge](https://github.com/DallogFheir/beginner-projects-bot/actions/workflows/testing.yml/badge.svg)](https://github.com/DallogFheir/beginner-projects-bot/actions/workflows/testing.yml)
 
 [u/BeginnerProjectsBot](https://www.reddit.com/user/BeginnerProjectsBot)
 
