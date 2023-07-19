@@ -102,20 +102,24 @@ class BPB:
                     prawcore.exceptions.ServerError,
                     prawcore.exceptions.RequestException,
                     prawcore.exceptions.ResponseException,
-                ):
+                ) as err:
+                    parsed_err = self.parse_traceback(err)
+
                     self.stdout_logger.info(
                         f"ServerError happened in {thread_name}. Restarting..."
                     )
                     self.stderr_logger.info(
-                        f"ServerError happened in {thread_name}.\n{traceback.format_exc(limit=1)}"
+                        f"ServerError happened in {thread_name}.\n{parsed_err}\n"
                         + "*" * 20
                     )
                     self.stop()
                     time.sleep(300)
                     self.start()
-                except:
+                except Exception as err:
+                    parsed_err = self.parse_traceback(err)
+
                     self.stderr_logger.critical(
-                        f"Unexpected exception happened in {thread_name}.\n{traceback.format_exc(limit=1)}"
+                        f"Unexpected exception happened in {thread_name}.\n{parsed_err}\n"
                         + "*" * 20
                     )
                     self.stop()
@@ -330,3 +334,14 @@ class BPB:
         match = re.search(self.title_pattern, title)
 
         return False if match is None else True
+
+    def parse_traceback(self, err: Exception) -> str:
+        tb = [
+            frame
+            for frame in traceback.extract_tb(err.__traceback__)
+            if frame.filename.startswith(str(Path(__file__).parent))
+        ]
+        formatted_tb = "\n".join(part.rstrip() for part in traceback.format_list(tb))
+        error_msg = str(err).strip()
+
+        return f"Traceback:\n{formatted_tb}\n{type(err).__name__}: {error_msg if error_msg != '' else '<no message>'}"
