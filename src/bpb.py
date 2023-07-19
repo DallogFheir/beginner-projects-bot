@@ -107,14 +107,16 @@ class BPB:
                         f"ServerError happened in {thread_name}. Restarting..."
                     )
                     self.stderr_logger.info(
-                        f"ServerError happened in {thread_name}. {traceback.format_exc()}"
+                        f"ServerError happened in {thread_name}.\n{traceback.format_exc(limit=1)}"
+                        + "*" * 20
                     )
                     self.stop()
                     time.sleep(300)
                     self.start()
                 except:
                     self.stderr_logger.critical(
-                        f"Unexpected exception happened in {thread_name}. {traceback.format_exc()}"
+                        f"Unexpected exception happened in {thread_name}.\n{traceback.format_exc(limit=1)}"
+                        + "*" * 20
                     )
                     self.stop()
 
