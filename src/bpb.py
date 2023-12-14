@@ -113,7 +113,7 @@ class BPB:
                         + "*" * 20
                     )
                     self.stop()
-                    time.sleep(300)
+                    time.sleep(900)
                     self.start()
                 except Exception as err:
                     parsed_err = self.parse_traceback(err)
