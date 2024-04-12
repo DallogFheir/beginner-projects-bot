@@ -1,6 +1,6 @@
 certifi==2023.11.17
 charset-normalizer==3.3.2
-idna==3.6
+idna==3.7
 praw==7.7.1
 prawcore==2.4.0
 pushbullet.py==0.12.0
