@@ -49,7 +49,7 @@ class BPB:
 
         # reads config from env vars
         # if not found, from praw.ini
-        self.reddit = praw.Reddit(user_agent=user_agent)
+        self.reddit = praw.Reddit("bpb", user_agent=user_agent)
 
         self.sub = self.reddit.subreddit("learnpython")
         self.bot = self.reddit.redditor("BeginnerProjectsBot")
