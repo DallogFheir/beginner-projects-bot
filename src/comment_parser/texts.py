@@ -40,6 +40,8 @@ _title_text = r"""
     ^
     # ignore words
     (?!
+    .*choos(ing)?\ tools?\ for
+    |
     .*troubleshooting
     |
     .*critique
