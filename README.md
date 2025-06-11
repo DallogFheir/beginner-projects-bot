@@ -8,7 +8,7 @@ Someone redo this using NLP and reinforcement learning.
 
 <br />
 
-# beginner-projects-bot
+# Beginner Projects Bot
 
 ![robot](robot.png)
 
