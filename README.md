@@ -1,3 +1,13 @@
+### <p align="center">💀 OBITUARY 💀</p>
+
+Turned off on 10/06/2025.
+
+One of my first Python projects. The code is not good, but there are some unit tests (which are not good either) and a GitHub workflow that runs these tests.
+
+Someone redo this using NLP and reinforcement learning.
+
+<br />
+
 # beginner-projects-bot
 
 ![robot](robot.png)
@@ -59,3 +69,4 @@ r/learnpython bot for beginner project resources.
 - 1.0.0
   - bot replies to submissions about beginner projects in Python with links to lists of such projects
   - bot edits its comments after receiving a certain number of upvotes, or receiving awards
+
